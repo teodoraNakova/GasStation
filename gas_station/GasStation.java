@@ -1,10 +1,14 @@
 package gas_station;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -72,6 +76,13 @@ public class GasStation {
 	}
 	
 	private void getSumOfAllFuel(Connection connection) {
+		int counter = 0;
+		File report = new File("report getSumOfAllFuel"+(++counter)+"-"+LocalDate.now()+".txt");
+		try {
+			report.createNewFile();
+		} catch (IOException e1) {
+			System.out.println("Error creating file.");
+		}
 		String st1 = "SELECT SUM(fuel_quantity)*2 AS 'sum gasoline' FROM station_loadings WHERE fuel_type='Gasoline';";
 		String st2 = "SELECT SUM(fuel_quantity)*2.40 AS 'sum diesel' FROM station_loadings WHERE fuel_type='Diesel';";
 		String st3 = "SELECT SUM(fuel_quantity)*1.60 AS 'sum gas' FROM station_loadings WHERE fuel_type='Gas';";
@@ -83,16 +94,26 @@ public class GasStation {
 			Statement statement3 = connection.createStatement();
 			ResultSet r2 = statement3.executeQuery(st3);
 			int finalResult = 0;
-			while(r.next()) {
-				finalResult += r.getInt("sum gasoline");
+			try(FileOutputStream fos = new FileOutputStream(report)){
+				while(r.next()) {
+					finalResult += r.getInt("sum gasoline");
+				}
+				while(r1.next()) {
+					finalResult += r1.getInt("sum diesel");
+				}
+				while(r2.next()) {
+					finalResult += r2.getInt("sum gas");
+				}
+				String s = "Total sum - " + finalResult;
+				System.out.println(s);
+				for(char c : s.toCharArray()) {
+					fos.write(c);
+				}
+			} catch (FileNotFoundException e) {
+				System.out.println(e.getMessage());
+			} catch (IOException e) {
+				System.out.println(e.getMessage());
 			}
-			while(r1.next()) {
-				finalResult += r1.getInt("sum diesel");
-			}
-			while(r2.next()) {
-				finalResult += r2.getInt("sum gas");
-			}
-			System.out.println("Total sum - " + finalResult);
 			
 		} catch (SQLException e) {
 			System.out.println("Prepare statement error " + e.getMessage());
@@ -100,12 +121,32 @@ public class GasStation {
 	}
 
 	private void getSumByFuelType(Connection connection) {
+		int counter = 0;
+		File report = new File("report getSumByFuelType"+(++counter)+"-"+LocalDate.now()+".txt");
+		try {
+			report.createNewFile();
+		} catch (IOException e1) {
+			System.out.println("Error creating file " + e1.getMessage());
+		}
 		try {
 			String st = "SELECT fuel_type, SUM(fuel_quantity) AS 'sum' FROM station_loadings GROUP BY fuel_type;";
 			Statement statement = connection.createStatement();
 			ResultSet result = statement.executeQuery(st);
+			StringBuilder sb = new StringBuilder();
 			while(result.next()) {
-				System.out.println(result.getString("fuel_type") + " - " + result.getInt("sum"));
+				String s = result.getString("fuel_type") + " - " + result.getInt("sum");
+				System.out.println(s);
+				sb.append(s + " ");
+				try(FileOutputStream fos = new FileOutputStream(report)) {
+					String str = sb.toString();
+					for(char c : str.toCharArray()) {
+						fos.write(c);
+					}
+				} catch (FileNotFoundException e) {
+					System.out.println(e.getMessage());
+				} catch (IOException e) {
+					e.getMessage();
+				}
 			}
 		} catch (SQLException e) {
 			System.out.println("Error creating statement." + e.getMessage());
@@ -118,10 +159,31 @@ public class GasStation {
 		try {
 			Statement statement = connection.createStatement();
 			ResultSet result = statement.executeQuery(st);
+			StringBuilder sb = new StringBuilder();
 			while(result.next()) {
-				System.out.println("Kolonka: " + result.getInt("kolonka_id"));
-				System.out.println("Number of cars: " + result.getInt("kolonka"));
+				String result1 = "Kolonka: " + result.getInt("kolonka_id");
+				String result2 = "Number of cars: " + result.getInt("kolonka");
+				sb.append(result1 + " " + result2 + " ");
+				System.out.println(result1);
+				System.out.println(result2);
 				System.out.println("===================");
+			}
+			int counter = 0;
+			File report = new File("report-getNumberOfCarsForEachColumn"+(++counter)+"-"+LocalDate.now()+".txt");
+			try {
+				report.createNewFile();
+			} catch (IOException e1) {
+				System.out.println("Error creating file " + e1.getMessage());
+			}
+			try(FileOutputStream fos = new FileOutputStream(report)) {
+				String s = sb.toString();
+				for(char c : s.toCharArray()) {
+					fos.write(c);
+				}
+			} catch (FileNotFoundException e) {
+				System.out.println(e.getMessage());
+			} catch (IOException e) {
+				System.out.println(e.getMessage());
 			}
 		} catch (SQLException e) {
 			System.out.println("Error creating statement." + e.getMessage());
@@ -133,12 +195,34 @@ public class GasStation {
 		try {
 			Statement statement = connection.createStatement();
 			ResultSet result = statement.executeQuery(st);
+			StringBuilder sb = new StringBuilder();
 			while(result.next()) {
-				System.out.println("Kolonka- " + result.getInt("kolonka_id"));
-				System.out.println("Fuel type- " + result.getString("fuel_type"));
-				System.out.println("Fuel quantity- " + result.getInt("fuel_quantity"));
-				System.out.println("Loading time- " + result.getString("loading_time"));
+				String s1 = "Kolonka- " + result.getInt("kolonka_id");
+				String s2 = "Fuel type- " + result.getString("fuel_type");
+				String s3 = "Fuel quantity- " + result.getInt("fuel_quantity");
+				String s4 = "Loading time- " + result.getString("loading_time");
+				sb.append(s1 + " ");
+				sb.append(s2 + " ");
+				sb.append(s3 + " ");
+				sb.append(s4 + " ");
+				System.out.println(s1);
+				System.out.println(s2);
+				System.out.println(s3);
+				System.out.println(s4);
 				System.out.println("===================");
+			}
+			int counter = 0;
+			File report = new File("report-listAllLoadings"+(++counter)+"-"+LocalDate.now()+".txt");
+			try {
+				report.createNewFile();
+				try(FileOutputStream fos = new FileOutputStream(report)) {
+					String s = sb.toString();
+					for(char c : s.toCharArray()) {
+						fos.write(c);
+					}
+				}
+			} catch (IOException e1) {
+				System.out.println("Error creating file " + e1.getMessage());
 			}
 		} catch (SQLException e) {
 			System.out.println("Error in select statement." + e.getMessage());
