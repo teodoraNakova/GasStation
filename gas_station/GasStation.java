@@ -3,7 +3,6 @@ package gas_station;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import client.Car;
@@ -39,5 +38,15 @@ public class GasStation {
 	
 	public List<ArrayBlockingQueue> getColumns() {
 		return Collections.unmodifiableList(columns);
+	}
+	
+	public void startDay() {
+		while(true) {
+			try {
+				Thread.sleep(15*1000);
+			} catch (InterruptedException e) {
+				System.out.println("Interrupted ");
+			}
+		}
 	}
 }

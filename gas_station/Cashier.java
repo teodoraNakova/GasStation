@@ -27,6 +27,7 @@ public class Cashier extends Thread {
 	@Override
 	public void run() {
 		while (true) {
+			Connector con = Connector.getInstance();
 			try {
 				if (this.customres.size() > 0) {
 					Car car = this.customres.peek();
@@ -36,21 +37,16 @@ public class Cashier extends Thread {
 					int ammount = car.getAmmount();
 					LocalDate date = LocalDate.now();
 					if (!register.containsKey(column)) {
-						register.put(
-								column,
-								new ConcurrentHashMap<FuelType, ConcurrentHashMap<LocalDate, ArrayList<Integer>>>());
-						if (!register.get(column).containsKey(fuel)) {
-							register.get(column)
-									.put(fuel,
-											new ConcurrentHashMap<LocalDate, ArrayList<Integer>>());
-						}
-						if (!register.get(column).get(fuel).containsKey(date)) {
-							register.get(column).get(fuel)
-									.put(date, new ArrayList<Integer>());
-						}
+						register.put(column,new ConcurrentHashMap<FuelType, ConcurrentHashMap<LocalDate, ArrayList<Integer>>>());
+					}
+					if (!register.get(column).containsKey(fuel)) {
+						register.get(column).put(fuel,new ConcurrentHashMap<LocalDate, ArrayList<Integer>>());
+					}
+					if (!register.get(column).get(fuel).containsKey(date)) {
+						register.get(column).get(fuel).put(date, new ArrayList<Integer>());
 					}
 					register.get(column).get(fuel).get(date).add(ammount);
-					System.out.println("Success");
+					con.addToDataBase(column, fuel, ammount, date);
 					this.customres.take();
 				}
 			} catch (InterruptedException e) {
