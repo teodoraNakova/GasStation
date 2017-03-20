@@ -29,6 +29,9 @@ public class Connector {
 		return connector;
 	}
 	
+	public Connection getConnection() {
+		return connection;
+	}
 	public synchronized void addToDataBase(int column, FuelType fuel, int ammount, LocalDate date) {
 		
 			String fuelType = fuel.toString();
@@ -37,7 +40,7 @@ public class Connector {
 			try {
 				statement = connection.prepareStatement("INSERT INTO station_loadings(kolonka_id, fuel_type, fuel_quantity, loading_time) "
 						+ "VALUES(?, ?, ?, ?)");
-				statement.setLong(1, column);
+				statement.setInt(1, column);
 				statement.setString(2, fuelType);
 				statement.setLong(3, ammount);
 				statement.setString(4, localDate);

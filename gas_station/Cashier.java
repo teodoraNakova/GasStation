@@ -26,8 +26,8 @@ public class Cashier extends Thread {
 
 	@Override
 	public void run() {
+		Connector con = Connector.getInstance();
 		while (true) {
-			Connector con = Connector.getInstance();
 			try {
 				if (this.customres.size() > 0) {
 					Car car = this.customres.peek();

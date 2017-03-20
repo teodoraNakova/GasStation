@@ -21,7 +21,6 @@ public class FuelBoy extends Thread {
 						Car car = column.take();
 						Thread.sleep(5 * 1000);
 						car.pumpFuel();
-						System.out.println("fuel boy did his job.");
 					} catch (InterruptedException e) {
 						System.out.println("Interrupted fuel boy.");
 					}
